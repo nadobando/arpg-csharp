@@ -1,0 +1,75 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master  # This triggers the workflow when there is a push to the master branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.x'  # Specify your required .NET version
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Test
+        run: dotnet test -c Release
+
+      - name: Pack
+        run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ../../output -c Release --no-build
+
+      - name: Create output directory
+        run: mkdir -p output
+
+      - name: Upload package as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: output
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download package artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: package
+          path: output
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: 'release-${{ github.sha }}'
+          release_name: 'Release ${{ github.sha }}'
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./output/*.nupkg
+          asset_name: com.arpg.api.nupkg
+          asset_content_type: application/zip
