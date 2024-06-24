@@ -31,6 +31,8 @@ jobs:
           VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" src/com.arpg.api/com.arpg.api.csproj)
           echo "Extracted version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        shell: bash
 
       - name: Verify extracted version
         run: echo "VERSION is ${{ env.VERSION }}"
