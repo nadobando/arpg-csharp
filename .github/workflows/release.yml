@@ -64,7 +64,7 @@ jobs:
           name: package
 
       - name: List downloaded package
-        run: ls -la ./output
+        run: ls -la 
 
       - name: Create GitHub Release
         id: create_release
