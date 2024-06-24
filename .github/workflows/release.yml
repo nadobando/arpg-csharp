@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master  # This triggers the workflow when there is a push to the master branch
+
+
 permissions:
   contents: write
   packages: write
@@ -24,6 +26,12 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
 
+      - name: Extract version from .csproj
+        id: extract_version
+        run: |
+          VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" src/com.arpg.api/com.arpg.api.csproj)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Build
         run: dotnet build -c Release
 
@@ -33,11 +41,14 @@ jobs:
       - name: Pack
         run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ./output -c Release --no-build
 
+      - name: List output directory
+        run: ls -la ./output
+
       - name: Upload package as artifact
         uses: actions/upload-artifact@v2
         with:
           name: package
-          path: ./output/*.nupkg
+          path: ./output/com.arpg.api.${{ env.VERSION }}.nupkg
 
   release:
     runs-on: ubuntu-latest
@@ -52,11 +63,14 @@ jobs:
         with:
           name: package
 
+      - name: List downloaded package
+        run: ls -la ./output
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           tag_name: 'release-${{ github.sha }}'
           release_name: 'Release ${{ github.sha }}'
@@ -66,9 +80,9 @@ jobs:
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./output/*.nupkg
-          asset_name: com.arpg.api.nupkg
+          asset_path: ./output/com.arpg.api.${{ env.VERSION }}.nupkg
+          asset_name: com.arpg.api.${{ env.VERSION }}.nupkg
           asset_content_type: application/zip
