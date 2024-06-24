@@ -67,6 +67,12 @@ jobs:
         with:
           name: package
 
+      - name: List root directory
+        run: ls -la 
+
+      - name: List output directory
+        run: ls -la ./output
+
       - name: Read version
         run: echo "VERSION is ${{ needs.build.outputs.version }}"
 
