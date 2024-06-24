@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master  # This triggers the workflow when there is a push to the master branch
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   build:
