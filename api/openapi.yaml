@@ -1,0 +1,518 @@
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.0.1
+servers:
+- url: /
+paths:
+  /users/me:
+    get:
+      operationId: users_current_user_users_me_get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        "401":
+          description: Missing token or inactive user.
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Users:Current User
+      tags:
+      - users
+    patch:
+      operationId: users_patch_current_user_users_me_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        "401":
+          description: Missing token or inactive user.
+        "400":
+          content:
+            application/json:
+              examples:
+                UPDATE_USER_EMAIL_ALREADY_EXISTS:
+                  summary: A user with this email already exists.
+                  value:
+                    detail: UPDATE_USER_EMAIL_ALREADY_EXISTS
+                UPDATE_USER_INVALID_PASSWORD:
+                  summary: Password validation failed.
+                  value:
+                    detail:
+                      code: UPDATE_USER_INVALID_PASSWORD
+                      reason: Password should beat least 3 characters
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+          description: Bad Request
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Users:Patch Current User
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      operationId: users_delete_user_users__id__delete
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          title: Id
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Successful Response
+        "401":
+          description: Missing token or inactive user.
+        "403":
+          description: Not a superuser.
+        "404":
+          description: The user does not exist.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Users:Delete User
+      tags:
+      - users
+    get:
+      operationId: users_user_users__id__get
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          title: Id
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        "401":
+          description: Missing token or inactive user.
+        "403":
+          description: Not a superuser.
+        "404":
+          description: The user does not exist.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Users:User
+      tags:
+      - users
+    patch:
+      operationId: users_patch_user_users__id__patch
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          title: Id
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        "401":
+          description: Missing token or inactive user.
+        "403":
+          description: Not a superuser.
+        "404":
+          description: The user does not exist.
+        "400":
+          content:
+            application/json:
+              examples:
+                UPDATE_USER_EMAIL_ALREADY_EXISTS:
+                  summary: A user with this email already exists.
+                  value:
+                    detail: UPDATE_USER_EMAIL_ALREADY_EXISTS
+                UPDATE_USER_INVALID_PASSWORD:
+                  summary: Password validation failed.
+                  value:
+                    detail:
+                      code: UPDATE_USER_INVALID_PASSWORD
+                      reason: Password should beat least 3 characters
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+          description: Bad Request
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Users:Patch User
+      tags:
+      - users
+  /auth/jwt/login:
+    post:
+      operationId: auth_unity_login_auth_jwt_login_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Body_auth_unity_login_auth_jwt_login_post'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiOTIyMWZmYzktNjQwZi00MzcyLTg2ZDMtY2U2NDJjYmE1NjAzIiwiYXVkIjoiZmFzdGFwaS11c2VyczphdXRoIiwiZXhwIjoxNTcxNTA0MTkzfQ.M10bjOe45I5Ncu_uXvOmVV8QxnL-nZfcH96U90JaocI
+                token_type: bearer
+              schema:
+                $ref: '#/components/schemas/BearerResponse'
+          description: Successful Response
+        "400":
+          content:
+            application/json:
+              examples:
+                LOGIN_BAD_CREDENTIALS:
+                  summary: Bad credentials or the user is inactive.
+                  value:
+                    detail: LOGIN_BAD_CREDENTIALS
+                LOGIN_USER_NOT_VERIFIED:
+                  summary: The user is not verified.
+                  value:
+                    detail: LOGIN_USER_NOT_VERIFIED
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+          description: Bad Request
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Auth:Unity.Login
+      tags:
+      - auth
+  /auth/jwt/logout:
+    post:
+      operationId: auth_unity_logout_auth_jwt_logout_post
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "401":
+          description: Missing token or inactive user.
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Auth:Unity.Logout
+      tags:
+      - auth
+  /auth/request-verify-token:
+    post:
+      operationId: verify_request_token_auth_request_verify_token_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Body_verify_request_token_auth_request_verify_token_post'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Verify:Request-Token
+      tags:
+      - auth
+  /auth/verify:
+    post:
+      operationId: verify_verify_auth_verify_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Body_verify_verify_auth_verify_post'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        "400":
+          content:
+            application/json:
+              examples:
+                VERIFY_USER_BAD_TOKEN:
+                  summary: "Bad token, not existing user ornot the e-mail currently\
+                    \ set for the user."
+                  value:
+                    detail: VERIFY_USER_BAD_TOKEN
+                VERIFY_USER_ALREADY_VERIFIED:
+                  summary: The user is already verified.
+                  value:
+                    detail: VERIFY_USER_ALREADY_VERIFIED
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+          description: Bad Request
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Verify:Verify
+      tags:
+      - auth
+  /auth/secure-endpoint:
+    get:
+      operationId: secure_endpoint_auth_secure_endpoint_get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Secure Endpoint
+      tags:
+      - auth
+components:
+  schemas:
+    BearerResponse:
+      example:
+        access_token: access_token
+        token_type: token_type
+      properties:
+        access_token:
+          title: Access Token
+          type: string
+        token_type:
+          title: Token Type
+          type: string
+      required:
+      - access_token
+      - token_type
+      title: BearerResponse
+    Body_auth_unity_login_auth_jwt_login_post:
+      properties:
+        grant_type:
+          nullable: true
+          pattern: password
+          type: string
+        username:
+          title: Username
+          type: string
+        password:
+          title: Password
+          type: string
+        scope:
+          default: ""
+          title: Scope
+          type: string
+        client_id:
+          nullable: true
+          type: string
+        client_secret:
+          nullable: true
+          type: string
+      required:
+      - password
+      - username
+      title: Body_auth_unity_login_auth_jwt_login_post
+    Body_verify_request_token_auth_request_verify_token_post:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+      required:
+      - email
+      title: Body_verify_request_token_auth_request_verify_token_post
+    Body_verify_verify_auth_verify_post:
+      properties:
+        token:
+          title: Token
+          type: string
+      required:
+      - token
+      title: Body_verify_verify_auth_verify_post
+    ErrorModel:
+      example:
+        detail: Detail
+      properties:
+        detail:
+          $ref: '#/components/schemas/Detail'
+      required:
+      - detail
+      title: ErrorModel
+    HTTPValidationError:
+      example:
+        detail:
+        - msg: msg
+          loc:
+          - ValidationError_loc_inner
+          - ValidationError_loc_inner
+          type: type
+        - msg: msg
+          loc:
+          - ValidationError_loc_inner
+          - ValidationError_loc_inner
+          type: type
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+      title: HTTPValidationError
+    UserRead:
+      example:
+        is_active: true
+        is_superuser: false
+        id: 5eb7cf5a86d9755df3a6c593
+        is_verified: false
+        email: email
+      properties:
+        id:
+          example: 5eb7cf5a86d9755df3a6c593
+          title: Id
+          type: string
+        email:
+          format: email
+          title: Email
+          type: string
+        is_active:
+          default: true
+          title: Is Active
+          type: boolean
+        is_superuser:
+          default: false
+          title: Is Superuser
+          type: boolean
+        is_verified:
+          default: false
+          title: Is Verified
+          type: boolean
+      required:
+      - email
+      - id
+      title: UserRead
+    UserUpdate:
+      example:
+        password: password
+        is_active: true
+        is_superuser: true
+        is_verified: true
+        email: email
+      properties:
+        password:
+          nullable: true
+          type: string
+        email:
+          format: email
+          nullable: true
+          type: string
+        is_active:
+          nullable: true
+          type: boolean
+        is_superuser:
+          nullable: true
+          type: boolean
+        is_verified:
+          nullable: true
+          type: boolean
+      title: UserUpdate
+    ValidationError:
+      example:
+        msg: msg
+        loc:
+        - ValidationError_loc_inner
+        - ValidationError_loc_inner
+        type: type
+      properties:
+        loc:
+          items:
+            $ref: '#/components/schemas/ValidationError_loc_inner'
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    Detail:
+      anyOf:
+      - type: string
+      - additionalProperties:
+          type: string
+      title: Detail
+    ValidationError_loc_inner:
+      anyOf:
+      - type: string
+      - type: integer
+  securitySchemes:
+    OAuth2PasswordBearer:
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: auth/jwt/login
+      type: oauth2
+
