@@ -28,16 +28,13 @@ jobs:
         run: dotnet test -c Release
 
       - name: Pack
-        run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ../../output -c Release --no-build
-
-      - name: Create output directory
-        run: mkdir -p output
+        run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ./output -c Release --no-build
 
       - name: Upload package as artifact
         uses: actions/upload-artifact@v2
         with:
           name: package
-          path: output
+          path: ./output/*.nupkg
 
   release:
     runs-on: ubuntu-latest
@@ -51,7 +48,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: package
-          path: output
 
       - name: Create GitHub Release
         id: create_release
