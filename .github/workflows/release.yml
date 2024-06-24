@@ -69,8 +69,7 @@ jobs:
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+        
         with:
           tag_name: 'release-${{ github.sha }}'
           release_name: 'Release ${{ github.sha }}'
@@ -79,8 +78,7 @@ jobs:
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./output/com.arpg.api.${{ env.VERSION }}.nupkg
