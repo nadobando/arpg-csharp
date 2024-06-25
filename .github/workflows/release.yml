@@ -97,3 +97,6 @@ jobs:
           asset_path: ./output/com.arpg.api.${{ needs.build.outputs.version }}.nupkg
           asset_name: com.arpg.api.${{ needs.build.outputs.version }}.nupkg
           asset_content_type: application/zip
+
+      - name: Publish NuGet package to GitHub Packages
+        run: dotnet nuget push ./output/com.arpg.api.${{ needs.build.outputs.version }}.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
