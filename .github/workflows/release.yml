@@ -43,30 +43,7 @@ jobs:
         run: dotnet test -c Release
 
       - name: Pack
-        run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ./output -c Release 
-
-      - name: Upload package as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: package
-          path: ./output/*.nupkg
-
-  release:
-    runs-on: ubuntu-latest
-    needs: build  # This job depends on the 'build' job
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Download package artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: package
-          path: ./output
-
-      - name: Read version
-        run: echo "VERSION is ${{ needs.build.outputs.version }}"
+        run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ./output -c Release --no-build
 
       - name: Create GitHub Release
         id: create_release
@@ -74,13 +51,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 'v${{ needs.build.outputs.version }}'
-          release_name: 'Release v${{ needs.build.outputs.version }}'
+          tag_name: 'v${{ steps.extract_version.outputs.version }}'
+          release_name: 'Release v${{ steps.extract_version.outputs.version }}'
           draft: false
           prerelease: false
 
-      - name: Output Release URL
-        run: "echo \"Release URL: ${{ steps.create_release.outputs.html_url }}\""
-
       - name: Publish NuGet package to GitHub Packages
-        run: dotnet nuget push ./output/com.arpg.api.${{ needs.build.outputs.version }}.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        run: dotnet nuget push ./output/com.arpg.api.${{ steps.extract_version.outputs.version }}.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
