@@ -69,7 +69,7 @@ jobs:
           path: ./output
 
       - name: List root directory
-        run: ls -la 
+        run: ls -la
 
       - name: List output directory
         run: ls -la ./output
@@ -83,8 +83,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 'release-${{ github.sha }}'
-          release_name: 'Release ${{ github.sha }}'
+          tag_name: 'v${{ needs.build.outputs.version }}'
+          release_name: 'Release v${{ needs.build.outputs.version }}'
           draft: false
           prerelease: false
 
