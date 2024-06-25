@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     branches:
-      - master  # This triggers the workflow when there is a push to the master branch
+      - master
 
 permissions:
   contents: write
@@ -43,10 +43,7 @@ jobs:
         run: dotnet test -c Release
 
       - name: Pack
-        run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ./output -c Release --no-build
-
-      - name: List output directory
-        run: ls -la ./output
+        run: dotnet pack ./src/com.arpg.api/com.arpg.api.csproj -o ./output -c Release 
 
       - name: Upload package as artifact
         uses: actions/upload-artifact@v2
